@@ -28,6 +28,7 @@ import model.Conexao;
 import comparator.nomeComparator;
 import comparator.serieComparator;
 import comparator.turnoComparator;
+import model.ArduinoSerial;
 
 /**
  * FXML Controller class
@@ -113,11 +114,30 @@ public class CadastroController implements Initializable {
         btnExcluir.setOnAction(e -> excluir());
         btnEditar.setOnAction(e -> editar());
         btnPesquisa.setOnAction(e -> pesquisar(txtPesquisa.getText().trim(), cbFiltro.getSelectionModel().getSelectedItem()));
+        btnId.setOnAction(e -> cartao());
 
         //Ação Selecionar Item da Tabela
         tbAlunos.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selecionarTabela(newValue));
     }
 
+    public void cartao(){
+        ArduinoSerial arduino = new ArduinoSerial(cbPorta.getSelectionModel().getSelectedItem());
+        System.out.println(arduino.getNamePort());
+        arduino.initialize();
+        int flag=0;
+        boolean a = true;
+        if(a){
+            while(flag<=40000){
+                lbId.setText(arduino.read());
+                flag++;
+            }
+        }else{
+            arduino.close();
+        }
+        a = false;
+        arduino.close();
+    }
+    
     public void cadastro() {
         boolean b = false;
         if (txtMatricula.getText().equals("") || txtNome.getText().equals("")) {
