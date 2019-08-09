@@ -5,7 +5,9 @@
  */
 package controller;
 
+import comparator.cursoComparator;
 import java.net.URL;
+import java.util.Collections;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,12 +20,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javax.xml.bind.Marshaller;
 import main.Cadastro;
 import main.Principal;
 import model.Alerta;
 import model.Aluno;
 import model.Conexao;
+import comparator.nomeComparator;
+import comparator.serieComparator;
+import comparator.turnoComparator;
 
 /**
  * FXML Controller class
@@ -89,8 +93,9 @@ public class CadastroController implements Initializable {
     private ObservableList<String> turma = FXCollections.observableArrayList();
     private ObservableList<String> turno = FXCollections.observableArrayList();
     private ObservableList<String> serie = FXCollections.observableArrayList();
+    private ObservableList<Aluno> resultado = FXCollections.observableArrayList();
     private int mat = 0;
-
+    
     /**
      * Initializes the controller class.
      */
@@ -107,6 +112,7 @@ public class CadastroController implements Initializable {
         btnAdicionar.setOnAction(e -> cadastro());
         btnExcluir.setOnAction(e -> excluir());
         btnEditar.setOnAction(e -> editar());
+        btnPesquisa.setOnAction(e -> pesquisar(txtPesquisa.getText().trim(), cbFiltro.getSelectionModel().getSelectedItem()));
 
         //Ação Selecionar Item da Tabela
         tbAlunos.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selecionarTabela(newValue));
@@ -145,7 +151,6 @@ public class CadastroController implements Initializable {
                 }
             }
         }
-        System.out.println(Conexao.getAlunos());
     }
 
     public void excluir() {
@@ -161,7 +166,6 @@ public class CadastroController implements Initializable {
         if (Conexao.getAlunos().size() == 0) {
             limpar();
         }
-        System.out.println(Conexao.getAlunos());
     }
 
     public void editar() {
@@ -205,7 +209,6 @@ public class CadastroController implements Initializable {
                 }
             }
         }
-        System.out.println(Conexao.getAlunos());
     }
 
     public void carregarTabela() {
@@ -217,6 +220,7 @@ public class CadastroController implements Initializable {
         tcTurno.setCellValueFactory(value -> value.getValue().getTurno());
         tcSerie.setCellValueFactory(value -> value.getValue().getSerie());
         tbAlunos.setItems(Conexao.getAlunos());
+        Collections.sort(Conexao.getAlunos(), new nomeComparator());
     }
 
     public void carregarCB() {
@@ -236,19 +240,89 @@ public class CadastroController implements Initializable {
         cbTurno.setItems(turno);
         cbSerie.setItems(serie);
 
-        //Setando a 1ª Opção do ComboBox
+        //Setando a Opção do ComboBox
         cbPorta.getSelectionModel().select(2);
-        cbFiltro.getSelectionModel().select(0);
+        cbFiltro.getSelectionModel().select(1);
         cbCurso.getSelectionModel().select(0);
         cbTurma.getSelectionModel().select(0);
         cbTurno.getSelectionModel().select(0);
         cbSerie.getSelectionModel().select(0);
     }
 
+    public void pesquisar(String p, String f) {
+        //Limpa a Lista Temporaria
+        resultado.remove(0, resultado.size());
+
+        //Se a pesquisa for em branco
+        if (p.equals("")) {
+            carregarTabela();
+            limpar();
+        }
+
+        if (f.equals("Nome")) {
+            for (Aluno e : Conexao.getAlunos()) {
+                if (e.getNome().get().contains(p)) {
+                    resultado.add(e);
+                }
+            }
+        } else if (f.equals("Matrícula")) {
+            for (Aluno e : Conexao.getAlunos()) {
+                String m = Integer.toString(e.getMatricula().get());
+                if (m.contains(p)) {
+                    resultado.add(e);
+                }
+            }
+        } else if (f.equals("Cartão")) {
+            for (Aluno e : Conexao.getAlunos()) {
+                if (e.getIdCartao().get().contains(p)) {
+                    resultado.add(e);
+                }
+            }
+        } else if (f.equals("Curso")) {
+            for (Aluno e : Conexao.getAlunos()) {
+                if (e.getCurso().get().contains(p)) {
+                    resultado.add(e);
+                }
+            }
+        } else if (f.equals("Turma")) {
+            for (Aluno e : Conexao.getAlunos()) {
+                if (e.getTurma().get().contains(p)) {
+                    resultado.add(e);
+                }
+            }
+        } else if (f.equals("Turno")) {
+            for (Aluno e : Conexao.getAlunos()) {
+                if (e.getTurno().get().contains(p)) {
+                    resultado.add(e);
+                }
+            }
+        } else if (f.equals("Serie")) {
+            for (Aluno e : Conexao.getAlunos()) {
+                if (e.getSerie().get().contains(p)) {
+                    resultado.add(e);
+                }
+            }
+        }
+
+        //Preenche a tabela com o resultado
+        tbAlunos.setItems(resultado);
+        
+        //Lista por Nome, Curso, Serie ou Turno
+        if (f.equals("Curso")) {
+            Collections.sort(resultado, new cursoComparator());
+        } else if (f.equals("Serie")) {
+            Collections.sort(resultado, new serieComparator());
+        } else if (f.equals("Turno")) {
+            Collections.sort(resultado, new turnoComparator());
+        } else {
+            Collections.sort(resultado, new nomeComparator());
+        }
+    }
+
     public void limpar() {
         //Setando a 1ª Opção do ComboBox
         cbPorta.getSelectionModel().select(2);
-        cbFiltro.getSelectionModel().select(0);
+        cbFiltro.getSelectionModel().select(1);
         cbCurso.getSelectionModel().select(0);
         cbTurma.getSelectionModel().select(0);
         cbTurno.getSelectionModel().select(0);
