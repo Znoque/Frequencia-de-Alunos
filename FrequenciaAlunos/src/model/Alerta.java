@@ -22,17 +22,22 @@ public class Alerta {
         alert.showAndWait();
     }
     
-    public static boolean getAlertaConfirma(String titulo, String cabecalho, String conteudo){
+    public static boolean getAlertaConfirma(String titulo, String cabecalho){
+        boolean r;
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        ButtonType btnSim = new ButtonType("Sim");
+        ButtonType btnNao = new ButtonType("Não");
         alert.setTitle(titulo);
         alert.setHeaderText(cabecalho);
-        alert.setContentText(conteudo);
+        alert.setContentText("Escolha Uma Opção");
+        alert.getButtonTypes().setAll(btnSim, btnNao);
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            return true;
-        } else {
-            return false;
-        }
+            if (result.get() == btnSim) {
+                r = true;
+            } else {
+                r = false;
+            }
+        return r;
     }
     
     public static void getAlertaInfo(String titulo, String cabecalho, String conteudo){

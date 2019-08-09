@@ -29,7 +29,7 @@ public class PrincipalController implements Initializable {
     @FXML
     private Button btnSair;
     @FXML
-    private Button btnSobre;
+    private Button btnHistorico;
 
     /**
      * Initializes the controller class.
