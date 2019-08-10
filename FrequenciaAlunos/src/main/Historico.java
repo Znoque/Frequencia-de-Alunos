@@ -18,16 +18,16 @@ import model.Alerta;
  *
  * @author Znoque
  */
-public class Principal extends Application {
+public class Historico extends Application {
 
     private static Stage stage;
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/view/Principal.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/view/Historico.fxml"));
         stage.initStyle(StageStyle.UNDECORATED);
         Scene scene = new Scene(root);
-        stage.setTitle("Menu Principal");
+        stage.setTitle("Histórico do Aluno");
         stage.setScene(scene);
         stage.show();
         setStage(stage);
@@ -59,5 +59,4 @@ public class Principal extends Application {
     public static void setStage(Stage aStage) {
         stage = aStage;
     }
-
 }

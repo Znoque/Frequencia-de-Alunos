@@ -9,6 +9,8 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  *
@@ -23,6 +25,8 @@ public class Aluno {
     private StringProperty turma = new SimpleStringProperty();
     private StringProperty turno = new SimpleStringProperty();
     private StringProperty serie = new SimpleStringProperty();
+    private StringProperty status = new SimpleStringProperty();
+    private ObservableList<Ponto> pontos = FXCollections.observableArrayList();
     
 
     public Aluno(int matricula, String nome, String idCartao, String curso, String turma, String turno, String serie) {
@@ -34,16 +38,7 @@ public class Aluno {
         this.turno.set(turno);
         this.serie.set(serie);
         this.id.set(Conexao.cont++);
-    }
-    
-    public Aluno(int matricula, String nome, String curso, String turma, String turno, String serie) {
-        this.matricula.set(matricula);
-        this.nome.set(nome);
-        this.curso.set(curso);
-        this.turma.set(turma);
-        this.turno.set(turno);
-        this.serie.set(serie);
-        this.id.set(Conexao.cont++);
+        this.status.set("Entrada");
     }
 
     @Override
@@ -154,6 +149,27 @@ public class Aluno {
      */
     public IntegerProperty getId() {
         return id;
+    }
+
+    /**
+     * @return the pontos
+     */
+    public ObservableList<Ponto> getPontos() {
+        return pontos;
+    }
+
+    /**
+     * @return the status
+     */
+    public StringProperty getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(String status) {
+        this.status.set(status);
     }
 
 }

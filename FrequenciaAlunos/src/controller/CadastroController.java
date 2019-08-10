@@ -28,6 +28,7 @@ import model.Conexao;
 import comparator.nomeComparator;
 import comparator.serieComparator;
 import comparator.turnoComparator;
+import javafx.scene.Cursor;
 import model.ArduinoSerial;
 
 /**
@@ -96,13 +97,14 @@ public class CadastroController implements Initializable {
     private ObservableList<String> serie = FXCollections.observableArrayList();
     private ObservableList<Aluno> resultado = FXCollections.observableArrayList();
     private int mat = 0;
-    
+
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //Carregando os elementos da pagina
+        cursorMao();
         carregarTabela();
         carregarCB();
         lbId.setText("");
@@ -120,55 +122,81 @@ public class CadastroController implements Initializable {
         tbAlunos.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selecionarTabela(newValue));
     }
 
-    public void cartao(){
+    public void cursorMao() {
+        btnVoltar.setCursor(Cursor.HAND);
+        btnAdicionar.setCursor(Cursor.HAND);
+        btnEditar.setCursor(Cursor.HAND);
+        btnExcluir.setCursor(Cursor.HAND);
+        btnId.setCursor(Cursor.HAND);
+        btnLimpar.setCursor(Cursor.HAND);
+        btnPesquisa.setCursor(Cursor.HAND);
+        cbFiltro.setCursor(Cursor.HAND);
+        cbPorta.setCursor(Cursor.HAND);
+        cbCurso.setCursor(Cursor.HAND);
+        cbSerie.setCursor(Cursor.HAND);
+        cbTurma.setCursor(Cursor.HAND);
+        cbTurno.setCursor(Cursor.HAND);
+        tbAlunos.setCursor(Cursor.HAND);
+    }
+
+    public void cartao() {
         ArduinoSerial arduino = new ArduinoSerial(cbPorta.getSelectionModel().getSelectedItem());
         System.out.println(arduino.getNamePort());
         arduino.initialize();
-        int flag=0;
+        int flag = 0;
         boolean a = true;
-        if(a){
-            while(flag<=40000){
+        if (a) {
+            while (flag <= 40000) {
+                //lbId.setText(String.valueOf(flag));
                 lbId.setText(arduino.read());
                 flag++;
             }
-        }else{
+        } else {
             arduino.close();
         }
         a = false;
         arduino.close();
     }
-    
+
     public void cadastro() {
         boolean b = false;
         if (txtMatricula.getText().equals("") || txtNome.getText().equals("")) {
             Alerta.getAlertaErro("Erro Ao Cadastrar Aluno", "Erro ao realizar cadastro do aluno", "Por Favor Preencha o Campo de texto 'Matrícula' e/ou 'Nome'");
         } else {
-            String tempNome = "";
-            mat = Integer.parseInt(txtMatricula.getText().trim());
-            for (Aluno a : Conexao.getAlunos()) {
-                if (a.getMatricula().get() == mat) {
-                    b = true;
-                    tempNome = a.getNome().get();
-                    break;
-                } else {
-                    b = false;
+            try {
+                String tempNome = "";
+                String cartao = "";
+                mat = Integer.parseInt(txtMatricula.getText().trim());
+                for (Aluno a : Conexao.getAlunos()) {
+                    if (a.getMatricula().get() == mat) {
+                        b = true;
+                        tempNome = a.getNome().get();
+                        cartao = a.getIdCartao().get();
+                        break;
+                    } else if (a.getIdCartao().get().equals(lbId.getText())) {
+                        b = true;
+                        tempNome = a.getNome().get();
+                        cartao = a.getIdCartao().get();
+                        break;
+                    } else {
+                        b = false;
+                    }
                 }
-            }
-            if (b) {
-                Alerta.getAlertaInfo("Erro Ao Cadastrar Aluno", "Não é Possivel Cadastrar o Aluno", "Já existe um aluno com a matricula digitada:\nMatrícula: " + mat + "\nNome: " + tempNome);
-            } else {
-                try {
+                if (b) {
+                    Alerta.getAlertaInfo("Erro Ao Cadastrar Aluno", "Não é Possivel Cadastrar o Aluno", "Já Existe Um Aluno Com a Mesma Matricula ou Id do Cartão digitada:\nMatrícula: " + mat + "\nNome: " + tempNome + "\nCartão: " + cartao);
+                } else {
+
                     boolean r = Alerta.getAlertaConfirma("Deseja Inseir o Cadastro?", "Deseja inserir um novo Cadastro?");
                     if (r) {
                         mat = Integer.parseInt(txtMatricula.getText().trim());
-                        Conexao.getAlunos().add(new Aluno(mat, txtNome.getText().trim(), cbCurso.getSelectionModel().getSelectedItem(), cbTurma.getSelectionModel().getSelectedItem(), cbTurno.getSelectionModel().getSelectedItem(), cbSerie.getSelectionModel().getSelectedItem()));
+                        Conexao.getAlunos().add(new Aluno(mat, txtNome.getText().trim(), lbId.getText(), cbCurso.getSelectionModel().getSelectedItem(), cbTurma.getSelectionModel().getSelectedItem(), cbTurno.getSelectionModel().getSelectedItem(), cbSerie.getSelectionModel().getSelectedItem()));
                         carregarTabela();
                         limpar();
                         mat = 0;
                     }
-                } catch (NumberFormatException ex) {
-                    Alerta.getAlertaErro("Erro Ao Cadastrar Aluno", "Erro Ao Realizar Cadastro do Aluno", "Por Favor Preencha o Campo 'Matricula' Utilizando Apenas Números!!");
                 }
+            } catch (NumberFormatException ex) {
+                Alerta.getAlertaErro("Erro Ao Cadastrar Aluno", "Erro Ao Realizar Cadastro do Aluno", "Por Favor Preencha o Campo 'Matricula' Utilizando Apenas Números!!");
             }
         }
     }
@@ -193,40 +221,52 @@ public class CadastroController implements Initializable {
         if (txtMatricula.getText().equals("") || txtNome.getText().equals("")) {
             Alerta.getAlertaErro("Erro Ao Editar Aluno", "Erro ao editar cadastro do aluno", "Por Favor Selecione Um Item Na Tabela");
         } else {
-            String tempNome = "";
-            int id = tbAlunos.getSelectionModel().getSelectedItem().getId().get();
-            mat = Integer.parseInt(txtMatricula.getText().trim());
-            for (Aluno a : Conexao.getAlunos()) {
-                if ((a.getMatricula().get() == mat) && (a.getId().get() != id)) {
-                    b = true;
-                    tempNome = a.getNome().get();
-                    break;
-                } else {
-                    b = false;
+            try {
+                String tempNome = "";
+                String cartao = "";
+                int id = tbAlunos.getSelectionModel().getSelectedItem().getId().get();
+                mat = Integer.parseInt(txtMatricula.getText().trim());
+                for (Aluno a : Conexao.getAlunos()) {
+                    if ((a.getMatricula().get() == mat) && (a.getId().get() != id)) {
+                        b = true;
+                        tempNome = a.getNome().get();
+                        cartao = a.getIdCartao().get();
+                        break;
+                    }else if ((a.getIdCartao().get().equals(lbId.getText())) && (a.getId().get() != id)) { 
+                        b = true;
+                        tempNome = a.getNome().get();
+                        cartao = a.getIdCartao().get();
+                        break;
+                    }else {
+                        b = false;
+                    }
                 }
-            }
-            if (b) {
-                Alerta.getAlertaInfo("Erro ao Editar Cadastro Aluno", "Não é Possivel Editar o Cadastro do Aluno", "Já existe um aluno com a matricula digitada:\nMatrícula: " + mat + "\nNome: " + tempNome);
-            } else {
-                boolean r = Alerta.getAlertaConfirma("Deseja Alterar o Cadastro?", "Deseja Alterar o Cadastro Selecionado?");
-                if (r) {
-                    int posicao = 0;
-                    int idTabela = tbAlunos.getSelectionModel().getSelectedItem().getId().get();
-                    for (Aluno l : Conexao.getAlunos()) {
-                        if (idTabela == l.getId().get()) {
-                            Conexao.getAlunos().get(posicao).setMatricula(Integer.parseInt(txtMatricula.getText().trim()));
-                            Conexao.getAlunos().get(posicao).setNome(txtNome.getText().trim());
-                            Conexao.getAlunos().get(posicao).setIdCartao(lbId.getText());
-                            Conexao.getAlunos().get(posicao).setCurso(cbCurso.getSelectionModel().getSelectedItem());
-                            Conexao.getAlunos().get(posicao).setTurma(cbTurma.getSelectionModel().getSelectedItem());
-                            Conexao.getAlunos().get(posicao).setTurno(cbTurno.getSelectionModel().getSelectedItem());
-                            Conexao.getAlunos().get(posicao).setSerie(cbSerie.getSelectionModel().getSelectedItem());
-                            break;
-                        } else {
-                            posicao++;
+                if (b) {
+                    Alerta.getAlertaInfo("Erro ao Editar Cadastro Aluno", "Não é Possivel Editar o Cadastro do Aluno", "Já Existe Um Aluno Com a Mesma Matricula ou Id do Cartão digitada:\nMatrícula: " + mat + "\nNome: " + tempNome + "\nCartão: " + cartao);
+                } else {
+                    boolean r = Alerta.getAlertaConfirma("Deseja Alterar o Cadastro?", "Deseja Alterar o Cadastro Selecionado?");
+                    if (r) {
+                        int posicao = 0;
+                        int idTabela = tbAlunos.getSelectionModel().getSelectedItem().getId().get();
+                        for (Aluno l : Conexao.getAlunos()) {
+                            if (idTabela == l.getId().get()) {
+                                Conexao.getAlunos().get(posicao).setMatricula(Integer.parseInt(txtMatricula.getText().trim()));
+                                Conexao.getAlunos().get(posicao).setNome(txtNome.getText().trim());
+                                Conexao.getAlunos().get(posicao).setIdCartao(lbId.getText());
+                                Conexao.getAlunos().get(posicao).setCurso(cbCurso.getSelectionModel().getSelectedItem());
+                                Conexao.getAlunos().get(posicao).setIdCartao(lbId.getText());
+                                Conexao.getAlunos().get(posicao).setTurma(cbTurma.getSelectionModel().getSelectedItem());
+                                Conexao.getAlunos().get(posicao).setTurno(cbTurno.getSelectionModel().getSelectedItem());
+                                Conexao.getAlunos().get(posicao).setSerie(cbSerie.getSelectionModel().getSelectedItem());
+                                break;
+                            } else {
+                                posicao++;
+                            }
                         }
                     }
                 }
+            } catch (NumberFormatException ex) {
+                Alerta.getAlertaErro("Erro Ao Editar Aluno", "Erro Ao Editar Aluno", "Por Favor Preencha o Campo 'Matricula' Utilizando Apenas Números!!");
             }
         }
     }
@@ -326,7 +366,7 @@ public class CadastroController implements Initializable {
 
         //Preenche a tabela com o resultado
         tbAlunos.setItems(resultado);
-        
+
         //Lista por Nome, Curso, Serie ou Turno
         if (f.equals("Curso")) {
             Collections.sort(resultado, new cursoComparator());

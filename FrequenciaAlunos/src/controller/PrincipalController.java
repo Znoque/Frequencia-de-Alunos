@@ -9,9 +9,12 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import main.Cadastro;
+import main.Frequencia;
+import main.Historico;
 import main.Principal;
 import model.Alerta;
 
@@ -37,6 +40,8 @@ public class PrincipalController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        cursorMao();
+        
         btnSair.setOnAction(e -> {
             boolean r = Alerta.getAlertaSair();
             if (r) {
@@ -47,8 +52,17 @@ public class PrincipalController implements Initializable {
         });
         
         btnCadastro.setOnAction(e -> abrirCadastro());
+        btnFre.setOnAction(e -> abrirFrequencia());
+        btnHistorico.setOnAction(e -> abrirHistorico());
     }
 
+    public void cursorMao() {
+        btnCadastro.setCursor(Cursor.HAND);
+        btnFre.setCursor(Cursor.HAND);
+        btnHistorico.setCursor(Cursor.HAND);
+        btnSair.setCursor(Cursor.HAND);
+    }
+    
     public void abrirCadastro() {
         Cadastro c = new Cadastro();
         Principal.getStage().close();
@@ -56,6 +70,26 @@ public class PrincipalController implements Initializable {
             c.start(new Stage());
         } catch (Exception e) {
             Alerta.getAlertaErro("Erro Ao Abrir Tela de Cadastro", "Falha Ao Abrir Tela de Cadastro", "Não Foi Possivel Abir a Tela de Cadastro");
+        }
+    }
+    
+    public void abrirFrequencia() {
+        Frequencia f = new Frequencia();
+        Principal.getStage().close();
+        try {
+            f.start(new Stage());
+        } catch (Exception e) {
+            Alerta.getAlertaErro("Erro Ao Abrir Tela de Frequencia", "Falha Ao Abrir Tela de Frequencia", "Não Foi Possivel Abir a Tela de Frequencia");
+        }
+    }
+    
+    public void abrirHistorico() {
+        Historico h = new Historico();
+        Principal.getStage().close();
+        try {
+            h.start(new Stage());
+        } catch (Exception e) {
+            Alerta.getAlertaErro("Erro Ao Abrir Tela de Histórico", "Falha Ao Abrir Tela de Histórico", "Não Foi Possivel Abir a Tela de Histórico");
         }
     }
 }
