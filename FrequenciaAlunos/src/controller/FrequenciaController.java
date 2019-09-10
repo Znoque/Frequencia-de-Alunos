@@ -67,6 +67,8 @@ public class FrequenciaController implements Initializable {
     String dia = Mdata.getDiaSemana();
     String hora;
     int posicao;
+    private ArduinoSerial arduino = new ArduinoSerial("COM3");
+    private static String id = " ";
     
     /**
      * Initializes the controller class.
@@ -103,26 +105,30 @@ public class FrequenciaController implements Initializable {
         lbSerie.setText("");
         lbTurma.setText("");
         lbTurno.setText("");
-        cbPorta.getSelectionModel().select(2);
+        cbPorta.getSelectionModel().select(1);
         posicao=0;
     }
     
-    public void cartao(){
-        ArduinoSerial arduino = new ArduinoSerial(cbPorta.getSelectionModel().getSelectedItem());
-        System.out.println(arduino.getNamePort());
+    public void cartao() {
+        lbId.setText("");
+        arduino = new ArduinoSerial(cbPorta.getSelectionModel().getSelectedItem());
         arduino.initialize();
-        int flag=0;
+        int flag = 0;
         boolean a = true;
-        if(a){
-            while(flag<=40000){
-                //lbId.setText(String.valueOf(flag));
-                lbId.setText(arduino.read());
+        if (a) {
+            while (flag <= 40000) {
+                System.out.println(arduino.read());
+                if(flag==39998){
+                    //System.out.println("oi");
+                    id = arduino.read();
+                }
                 flag++;
             }
-        }else{
+            System.out.println(id);
+            lbId.setText(id);
+        } else {
             arduino.close();
         }
-        consultar(lbId.getText());
         a = false;
         arduino.close();
     }

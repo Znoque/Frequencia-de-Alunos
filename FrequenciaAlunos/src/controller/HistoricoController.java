@@ -83,7 +83,8 @@ public class HistoricoController implements Initializable {
     private ObservableList<String> porta = FXCollections.observableArrayList();
     private ObservableList<String> filtro = FXCollections.observableArrayList();
     private ObservableList<Ponto> resultado = FXCollections.observableArrayList();
-
+    private ArduinoSerial arduino = new ArduinoSerial("COM3");
+    private static String id = " ";
     /**
      * Initializes the controller class.
      */
@@ -143,24 +144,29 @@ public class HistoricoController implements Initializable {
         lbSerie.setText("");
         lbTurma.setText("");
         lbTurno.setText("");
-        cbPorta.getSelectionModel().select(2);
+        cbPorta.getSelectionModel().select(1);
         cbFiltro.getSelectionModel().select(1);
         //Limpa a Lista Temporaria
         resultado.remove(0, resultado.size());
     }
 
     public void cartao() {
-        ArduinoSerial arduino = new ArduinoSerial(cbPorta.getSelectionModel().getSelectedItem());
-        System.out.println(arduino.getNamePort());
+        lbId.setText("");
+        arduino = new ArduinoSerial(cbPorta.getSelectionModel().getSelectedItem());
         arduino.initialize();
         int flag = 0;
         boolean a = true;
         if (a) {
             while (flag <= 40000) {
-                //lbId.setText(String.valueOf(flag));
-                lbId.setText(arduino.read());
+                System.out.println(arduino.read());
+                if(flag==39998){
+                    //System.out.println("oi");
+                    id = arduino.read();
+                }
                 flag++;
             }
+            System.out.println(id);
+            lbId.setText(id);
         } else {
             arduino.close();
         }

@@ -24,7 +24,8 @@ import java.util.TooManyListenersException;
 public class ArduinoSerial implements SerialPortEventListener {
 
     private SerialPort serialPort;
-    private final String namePort;
+    private String namePort;
+    //private final String namePort;
 
     public ArduinoSerial(String portName) {
         this.namePort = portName;
@@ -144,5 +145,11 @@ public class ArduinoSerial implements SerialPortEventListener {
     public String getNamePort() {
         return namePort;
     }
-
+    
+    /**
+     * @return the namePort
+     */
+    public void setNamePort(String portName) {
+        this.namePort = portName;
+    }
 }

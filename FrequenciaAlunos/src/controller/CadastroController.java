@@ -97,6 +97,8 @@ public class CadastroController implements Initializable {
     private ObservableList<String> serie = FXCollections.observableArrayList();
     private ObservableList<Aluno> resultado = FXCollections.observableArrayList();
     private int mat = 0;
+    private ArduinoSerial arduino = new ArduinoSerial("COM3");
+    private static String id = " ";
 
     /**
      * Initializes the controller class.
@@ -104,6 +106,7 @@ public class CadastroController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //Carregando os elementos da pagina
+        //ArduinoSerial arduino = new ArduinoSerial(cbPorta.getSelectionModel().getSelectedItem());
         cursorMao();
         carregarTabela();
         carregarCB();
@@ -140,17 +143,22 @@ public class CadastroController implements Initializable {
     }
 
     public void cartao() {
-        ArduinoSerial arduino = new ArduinoSerial(cbPorta.getSelectionModel().getSelectedItem());
-        System.out.println(arduino.getNamePort());
+        lbId.setText("");
+        arduino = new ArduinoSerial(cbPorta.getSelectionModel().getSelectedItem());
         arduino.initialize();
         int flag = 0;
         boolean a = true;
         if (a) {
             while (flag <= 40000) {
-                //lbId.setText(String.valueOf(flag));
-                lbId.setText(arduino.read());
+                System.out.println(arduino.read());
+                if(flag==39998){
+                    //System.out.println("oi");
+                    id = arduino.read();
+                }
                 flag++;
             }
+            System.out.println(id);
+            lbId.setText(id);
         } else {
             arduino.close();
         }
@@ -301,7 +309,7 @@ public class CadastroController implements Initializable {
         cbSerie.setItems(serie);
 
         //Setando a Opção do ComboBox
-        cbPorta.getSelectionModel().select(2);
+        cbPorta.getSelectionModel().select(1);
         cbFiltro.getSelectionModel().select(1);
         cbCurso.getSelectionModel().select(0);
         cbTurma.getSelectionModel().select(0);
