@@ -109,6 +109,11 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Button>
+            <Label text="Copyright © 2019 Claudio Pales, Enoque Teixeira, Maria Eduarda. Todos Os Direitos Reservados." textAlignment="CENTER" wrapText="true" AnchorPane.bottomAnchor="18.0" AnchorPane.leftAnchor="10.0">
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font>
+            </Label>
          </children>
       </AnchorPane>
    </bottom>
